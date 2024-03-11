@@ -21,7 +21,10 @@ public class PlayerController : MonoBehaviour
     //private float slowdownFactor = 0.5f;
     //public float dampingDistance = 2f;
 
-    
+    private Vector3 wrappedPosition;
+    private Vector3 screenPosition;
+
+
 
     void Start()
     {
@@ -40,34 +43,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
-
-        // Check if the player is off-screen
-        if (screenPosition.x < 0 || screenPosition.x > Screen.width || screenPosition.y < 0 || screenPosition.y > Screen.height)
-        {
-            // Wrap the player's position to the opposite side of the screen
-            Vector3 wrappedPosition = transform.position;
-
-            if (screenPosition.x < 0)
-            {
-                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, screenPosition.y, 0)).x;
-            }
-            else if (screenPosition.x > Screen.width)
-            {
-                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(0, screenPosition.y, 0)).x;
-            }
-
-            if (screenPosition.y < 0)
-            {
-                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, Screen.height, 0)).y;
-            }
-            else if (screenPosition.y > Screen.height)
-            {
-                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, 0, 0)).y;
-            }
-
-            transform.position = wrappedPosition;
-        }
+        screenPosition = Camera.main.WorldToScreenPoint(transform.position);  //declare screen position outside of update!
     }
 
     public void MovePlayer()
@@ -102,9 +78,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButton("Fire1") && currentTime > nextFire)
         {
             nextFire += currentTime;
-        Instantiate(pfProjectile, spawnProjectilePosition.position, Quaternion.identity);
-        nextFire -= currentTime;
-        currentTime = 0f;
+            Instantiate(pfProjectile, spawnProjectilePosition.position, Quaternion.identity);
+            nextFire -= currentTime;
+            currentTime = 0f;
         }
     }
 
@@ -120,6 +96,35 @@ public class PlayerController : MonoBehaviour
         {
             sFX.GameOverSound();
             gameManager.GameOver();
+        }
+    }
+
+    // only check for player leaving screen if it leaves the collider
+    public void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("Wall"))
+        {
+            wrappedPosition = transform.position;
+
+            if (screenPosition.x < 0)
+            {
+                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, screenPosition.y, 0)).x;
+            }
+            else if (screenPosition.x > Screen.width)
+            {
+                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(0, screenPosition.y, 0)).x;
+            }
+
+            if (screenPosition.y < 0)
+            {
+                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, Screen.height, 0)).y;
+            }
+            else if (screenPosition.y > Screen.height)
+            {
+                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, 0, 0)).y;
+            }
+
+            transform.position = wrappedPosition;
         }
     }
 }

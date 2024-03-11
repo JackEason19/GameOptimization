@@ -25,9 +25,19 @@ public class EnemyProjectile : MonoBehaviour
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Asteroid"))
         {
             sFX.LaserHit();
-        DeleteObject();
+            DeleteObject();
         }
     }
+
+    void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("Wall"))
+        {
+            DeleteObject();
+        }
+    }
+
+
     void DeleteObject()
     {
         Destroy(gameObject);

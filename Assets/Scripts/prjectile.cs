@@ -33,6 +33,16 @@ public class prjectile : MonoBehaviour
         DeleteObject();
         }
     }
+
+    void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("Wall"))
+        {
+            DeleteObject();
+        }
+    }
+
+
     void DeleteObject()
     {
         Destroy(gameObject);

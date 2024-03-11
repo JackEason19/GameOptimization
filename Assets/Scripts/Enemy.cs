@@ -15,6 +15,9 @@ public class Enemy : MonoBehaviour
     public GameObject pfEnemyProjectile;
     public float shootInterval = .5f;
 
+    private Vector3 screenPosition;
+    private Vector3 wrappedPosition;
+
     void Awake()
     {
         sFX = FindObjectOfType<SFX>();
@@ -41,32 +44,7 @@ public class Enemy : MonoBehaviour
 
         
         
-        Vector3 screenPosition = Camera.main.WorldToScreenPoint(transform.position);
-        
-        if (screenPosition.x < 0 || screenPosition.x > Screen.width || screenPosition.y < 0 || screenPosition.y > Screen.height)
-        {
-            Vector3 wrappedPosition = transform.position;
-
-            if (screenPosition.x < 0)
-            {
-                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, screenPosition.y, 0)).x;
-            }
-            else if (screenPosition.x > Screen.width)
-            {
-                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(0, screenPosition.y, 0)).x;
-            }
-
-            if (screenPosition.y < 0)
-            {
-                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, Screen.height, 0)).y;
-            }
-            else if (screenPosition.y > Screen.height)
-            {
-                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, 0, 0)).y;
-            }
-
-            transform.position = wrappedPosition;
-        }
+        screenPosition = Camera.main.WorldToScreenPoint(transform.position);
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -90,7 +68,35 @@ public class Enemy : MonoBehaviour
        // }
     }
 
-        IEnumerator FireWeapon()
+    public void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("Wall"))
+        {
+            wrappedPosition = transform.position;
+
+            if (screenPosition.x < 0)
+            {
+                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, screenPosition.y, 0)).x;
+            }
+            else if (screenPosition.x > Screen.width)
+            {
+                wrappedPosition.x = Camera.main.ScreenToWorldPoint(new Vector3(0, screenPosition.y, 0)).x;
+            }
+
+            if (screenPosition.y < 0)
+            {
+                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, Screen.height, 0)).y;
+            }
+            else if (screenPosition.y > Screen.height)
+            {
+                wrappedPosition.y = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, 0, 0)).y;
+            }
+
+            transform.position = wrappedPosition;
+        }
+    }
+
+            IEnumerator FireWeapon()
     {
         while(true)
         {
